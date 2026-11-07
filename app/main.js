@@ -10,6 +10,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let W = 0, H = 0, dpr = 1, gx = 0, gy = 0, R = 0, S = 0, fcx = 0, fcy = 0;
 let tr = 0, target = 0, e = 0, lam = rad(-45), tilt = rad(22), z = 1, tz = 1, ax = 0, ay = 0, px = 0, py = 0;
+const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) <= 900 || /(^|[#&])lite=1/.test(location.hash);
 let pins = [], u = {}, indexCount = 0, stars = null, ready = false;
 
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -115,7 +116,7 @@ function texture(unit, src) {
   return t;
 }
 function countryMask(topo, visited, states, visitedStates) {
-  const size = Math.min(8192, gl.getParameter(gl.MAX_TEXTURE_SIZE));
+  const size = Math.min(lite ? 4096 : 8192, gl.getParameter(gl.MAX_TEXTURE_SIZE));
   const c = document.createElement('canvas'); c.width = size; c.height = size / 2;
   const x = c.getContext('2d', { willReadFrequently: true }), k = size / 360;
   x.fillStyle = '#000'; x.fillRect(0, 0, c.width, c.height);
@@ -173,7 +174,7 @@ function frame(now) {
   if (tr !== target) { tr = target > tr ? Math.min(target, tr + dt / 1.2) : Math.max(target, tr - dt / 1.2); }
   e = ease(tr);
   if (Math.abs(tz - z) > .0005) zoomTo(z + (tz - z) * (1 - Math.exp(-dt * 11)), ax, ay);
-  if (tr === 0 && target === 0 && !drag && !reduced && spin) lam += dt * rad(4.5);
+  if (tr === 0 && target === 0 && !drag && !reduced && spin) lam -= dt * rad(4.5);
   gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.uniform1f(u.e, e); gl.uniform1f(u.lam, wrap(lam) * (1 - e)); gl.uniform1f(u.f0, tilt * (1 - e));
   gl.uniform1f(u.R, R * z); gl.uniform1f(u.S, S * z); gl.uniform2f(u.gc, gx, gy); gl.uniform2f(u.fc, fcx + px, fcy + py); gl.uniform2f(u.res, W, H);
@@ -227,6 +228,7 @@ const endPtr = ev => {
 glc.addEventListener('pointerup', endPtr); glc.addEventListener('pointercancel', endPtr);
 glc.addEventListener('wheel', ev => { ev.preventDefault(); setZoom(tz * Math.exp(-ev.deltaY * .0022), ev.clientX, ev.clientY); hideTip(); }, { passive: false });
 $('zin').onclick = () => setZoom(tz * 1.8); $('zout').onclick = () => setZoom(tz / 1.8); $('back').onclick = () => setMode(false);
+if (!document.fullscreenEnabled) $('fs').hidden = true;
 $('fs').onclick = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); };
 addEventListener('keydown', ev => {
   const k = ev.key, step = 60;
@@ -247,7 +249,7 @@ addEventListener('resize', () => { layout(); });
 async function start() {
   const t0 = performance.now();
   if (!gl) { $('load').textContent = 'This Browser Needs WebGL 2 to Show the Globe'; return; }
-  const img = new Image(); img.src = 'assets/terrain-8k.jpg';
+  const img = new Image(); img.src = lite ? 'assets/terrain-4k.jpg' : 'assets/terrain-8k.jpg';
   const [topo, data, states] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json', { cache: 'no-cache' }).then(r => r.json()), fetch('assets/us-states.json?v=1').then(r => r.json()), img.decode()]);
   const T = {}, mark = n => { T[n] = Math.round(performance.now() - t0); }; mark('fetched');
   program(); grid(); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);

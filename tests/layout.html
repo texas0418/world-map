@@ -10,7 +10,7 @@ const box = b => [b.left, b.top, b.right, b.bottom].map(Math.round);
     const f = document.createElement('iframe'); f.style.cssText = `width:${w}px;height:${h}px;border:0;position:absolute;left:0;top:0`;
     f.src = '../index.html?layout=' + Date.now(); document.body.append(f);
     await new Promise(r => f.onload = r); const d = f.contentDocument;
-    d.getElementById('load').style.display = 'none'; d.getElementById('nC').textContent = '20'; d.getElementById('nP').textContent = '156'; d.getElementById('nS').textContent = '28'; d.getElementById('lC').textContent = 'Countries, 175 to Go'; d.getElementById('lS').textContent = 'States, 22 to Go';
+    d.getElementById('load').style.display = 'none'; d.getElementById('back').hidden = !flat; d.getElementById('nC').textContent = '20'; d.getElementById('nP').textContent = '156'; d.getElementById('nS').textContent = '28'; d.getElementById('lC').textContent = 'Countries, 175 to Go'; d.getElementById('lS').textContent = 'States, 22 to Go';
     d.body.classList.toggle('flat', !!flat); d.getElementById('back').hidden = !flat; await sleep(60);
     const r = id => d.querySelector(id).getBoundingClientRect();
     const bad = []; const texts = ['#panel h1', '.stats div:nth-child(1)', '.stats div:nth-child(2)', '.stats div:nth-child(3)'];
