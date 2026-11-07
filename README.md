@@ -16,6 +16,7 @@ In your fork, open `data/places.json` and click the pencil icon to edit it. The 
 
     {
     "visitedCountries": ["840", "826", "392"],
+    "visitedStates": ["Georgia", "Texas"],
     "places": [
     {"name": "Atlanta", "lat": 33.749, "lon": -84.388},
     {"name": "Aberdeen", "lat": 57.15, "lon": -2.094},
@@ -29,6 +30,7 @@ Delete the places that are there and put in your own.
 - **`visitedCountries`** is the list of countries to color gold. Look up each code in `data/country-codes.txt` and keep the quotes and any leading zeros, so Belgium is `"056"`. The countries in this list are what the Countries number counts.
 
 Pins do not color a country by themselves, so a new country needs both a pin and a code.
+- **`visitedStates`** (optional) is the list of US states to color gold, using full names like `"Texas"`. A state counts toward the 50 only if it is listed here, and `"District of Columbia"` colors DC without counting. Leave this list out and the whole US colors gold when `"840"` is in `visitedCountries`.
 
 **Finding coordinates:** on a computer, open Google Maps and right-click the place. The latitude and longitude are at the top of the menu, latitude first. Click them to copy.
 
@@ -45,6 +47,8 @@ After a few minutes your map is at `https://YOUR-USERNAME.github.io/world-map/`.
 ### 4. Add More Places Later
 
 Edit `data/places.json` again and commit. Your site updates by itself within a few minutes.
+
+The counts on the map show how many you have left, out of 195 countries and 50 states. To use a different country total, change `COUNTRIES` at the top of `app/main.js`.
 
 ## Change the Title
 

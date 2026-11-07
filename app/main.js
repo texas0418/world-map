@@ -5,7 +5,7 @@ const wrap = a => { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Mat
 const mill = p => 1.25 * Math.log(Math.tan(Math.PI / 4 + .4 * Math.max(Math.min(p, 1.56), -1.56)));
 const glc = $('gl'), bg = $('bg'), fg = $('fg'), bgx = bg.getContext('2d'), fx = fg.getContext('2d');
 const gl = glc.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: true });
-const MAP_TOP = 2.0, MAP_BOTTOM = -1.55, FLAT_MAX = 24, GLOBE_MAX = 2.5;
+const COUNTRIES = 195, MAP_TOP = 2.0, MAP_BOTTOM = -1.55, FLAT_MAX = 24, GLOBE_MAX = 2.5;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let W = 0, H = 0, dpr = 1, gx = 0, gy = 0, R = 0, S = 0, fcx = 0, fcy = 0;
@@ -113,7 +113,7 @@ function texture(unit, src) {
   const af = gl.getExtension('EXT_texture_filter_anisotropic');
   if (af) gl.texParameterf(gl.TEXTURE_2D, af.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(af.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
 }
-function countryMask(topo, visited) {
+function countryMask(topo, visited, states, visitedStates) {
   const size = Math.min(8192, gl.getParameter(gl.MAX_TEXTURE_SIZE));
   const c = document.createElement('canvas'); c.width = size; c.height = size / 2;
   const x = c.getContext('2d', { willReadFrequently: true }), k = size / 360;
@@ -130,9 +130,10 @@ function countryMask(topo, visited) {
     for (const s of shifts) { un.forEach((p, i) => { const X = (p[0] + s + 180) * k, Y = (90 - p[1]) * k; i ? x.lineTo(X, Y) : x.moveTo(X, Y); }); x.closePath(); }
   };
   const geo = topo.objects.countries.geometries.map(g => ({ id: g.id, rings: (g.type === 'MultiPolygon' ? g.arcs.flat() : g.arcs).map(ring) }));
-  for (const v of [false, true]) { x.beginPath(); for (const g of geo) if (visited.has(g.id) === v) g.rings.forEach(trace); x.fillStyle = v ? 'rgb(255,255,0)' : 'rgb(255,0,0)'; x.fill(); }
+  for (const v of [false, true]) { x.beginPath(); for (const g of geo) if ((visited.has(g.id) && !(states && g.id === '840')) === v) g.rings.forEach(trace); x.fillStyle = v ? 'rgb(255,255,0)' : 'rgb(255,0,0)'; x.fill(); }
+  if (states) { x.beginPath(); for (const n of visitedStates) (states[n] || []).forEach(p => p.forEach(trace)); x.fillStyle = 'rgb(255,255,0)'; x.fill(); }
   x.globalCompositeOperation = 'lighter'; x.strokeStyle = 'rgb(0,0,255)'; x.lineWidth = size / 4096;
-  x.beginPath(); for (const g of geo) g.rings.forEach(trace); x.stroke();
+  x.beginPath(); for (const g of geo) g.rings.forEach(trace); if (states) for (const n in states) states[n].forEach(p => p.forEach(trace)); x.stroke();
   return c;
 }
 
@@ -243,15 +244,16 @@ async function start() {
   const t0 = performance.now();
   if (!gl) { $('load').textContent = 'This Browser Needs WebGL 2 to Show the Globe'; return; }
   const img = new Image(); img.src = 'assets/terrain-8k.jpg';
-  const [topo, data] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json', { cache: 'no-cache' }).then(r => r.json()), img.decode()]);
+  const [topo, data, states] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json', { cache: 'no-cache' }).then(r => r.json()), fetch('assets/us-states.json?v=1').then(r => r.json()), img.decode()]);
   const T = {}, mark = n => { T[n] = Math.round(performance.now() - t0); }; mark('fetched');
   program(); grid(); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
   texture(0, img); mark('terrainUpload');
-  const mask = countryMask(topo, new Set(data.visitedCountries)); mark('maskDrawn');
+  const mask = countryMask(topo, new Set(data.visitedCountries), data.visitedStates ? states : null, data.visitedStates || []); mark('maskDrawn');
   texture(1, mask); mark('maskUpload'); window.__times = T;
   gl.uniform1i(u.ter, 0); gl.uniform1i(u.msk, 1);
   pins = data.places.map(p => { const lat = rad(p.lat); return { ...p, lon: rad(p.lon), lat, my: mill(lat) }; });
-  $('nC').textContent = data.visitedCountries.length; $('nP').textContent = pins.length;
+  const nC = data.visitedCountries.length, nS = (data.visitedStates || []).filter(n => n !== 'District of Columbia').length;
+  $('nC').textContent = nC; $('lC').textContent = `Countries, ${Math.max(0, COUNTRIES - nC)} to Go`; $('nS').textContent = nS; $('lS').textContent = `States, ${50 - nS} to Go`; $('nP').textContent = pins.length;
   layout();
   const h = new URLSearchParams(location.hash.slice(1));
   if (h.has('spin')) spin = h.get('spin') !== '0';

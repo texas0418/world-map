@@ -808,6 +808,43 @@
 "name": "Times Square",
 "lat": 40.758,
 "lon": -73.986
+},
+{
+"name": "Morrilton",
+"lat": 35.156,
+"lon": -92.742
 }
+],
+"visitedStates": [
+"Alabama",
+"Arizona",
+"Arkansas",
+"California",
+"Colorado",
+"District of Columbia",
+"Florida",
+"Georgia",
+"Illinois",
+"Indiana",
+"Iowa",
+"Louisiana",
+"Maryland",
+"Massachusetts",
+"Mississippi",
+"Nevada",
+"New Jersey",
+"New Mexico",
+"New York",
+"North Carolina",
+"Oregon",
+"Pennsylvania",
+"South Carolina",
+"South Dakota",
+"Tennessee",
+"Texas",
+"Utah",
+"Virginia",
+"Washington",
+"Wyoming"
 ]
 }
