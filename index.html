@@ -1,13 +1,26 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>My World Travels</title><meta name="description" content="A turning globe of every country and city I have been to."><link rel="stylesheet" href="app/style.css?v=6"></head>
+<title>My World Travels</title><meta name="description" content="A turning globe of every country and city I have been to."><link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="app/style.css?v=7"></head>
 <body>
 <canvas id="bg"></canvas><canvas id="gl" tabindex="0" aria-label="Interactive globe of visited places. Tap or press Enter to open the flat map."></canvas><canvas id="fg"></canvas>
 <div id="panel"><h1>My World Travels</h1>
 <div class="stats"><div><b id="nC"></b><span id="lC">Countries</span></div><div><b id="nS"></b><span id="lS">States</span></div><div><b id="nP"></b><span>Places</span></div></div></div>
+<button id="addOpen">+ Add Places</button>
+<aside id="ed" hidden aria-label="Add places"><div class="edh"><h2>Add Places</h2><button id="edClose" aria-label="Close Add Places">&times;</button></div>
+<div class="tabs" role="tablist"><button role="tab" data-t="s" aria-selected="true">Search</button><button role="tab" data-t="i" aria-selected="false">Import File</button><button role="tab" data-t="p" aria-selected="false">Privacy</button></div>
+<section id="s"><input id="q" class="field" type="search" placeholder="Search a City" aria-label="Search a city" autocomplete="off"><div id="res"></div>
+<h3>Or Drop a Pin</h3><div class="row"><div>Tap Anywhere on the Flat Map<small>Name it yourself, for places search does not find</small></div><button id="drop" class="act">Drop Pin</button></div>
+<form id="namef" hidden><h3>Name This Pin</h3><div class="namer"><input id="pinName" class="field" type="text" maxlength="80" aria-label="Pin name"><button class="act go">Add Pin</button></div></form>
+<h3 id="yoursH" hidden>Added on This Device</h3><div id="yours"></div></section>
+<section id="i" hidden><label class="drop" id="dz"><b>Choose a Google My Maps File</b>KMZ or KML. It stays on this device.<input id="file" type="file" accept=".kmz,.kml"></label><div id="imp"></div></section>
+<section id="p" hidden><div class="row"><div>Hide Exact Location<small>New pins move to the nearest city, and the name goes with it</small></div><button id="hideAll" class="sw" role="switch" aria-checked="false" aria-label="Hide exact location on new pins"></button></div>
+<input id="pq" class="field" type="search" placeholder="Find a Pin to Hide" aria-label="Find a pin to hide" autocomplete="off"><div id="plist"></div></section>
+<div class="save"><span id="saveNote">Saved on this device. To update your public site, download the map file and put it on your site.</span><button id="dl" class="act">Download Map File</button></div></aside>
+<div id="dropMsg" hidden>Tap the map where the pin goes. <button id="dropX" class="act">Cancel</button></div>
 <div id="tip" hidden></div>
 <div id="ctl"><button id="back" hidden>Back to Globe</button><button id="zin" aria-label="Zoom In">+</button><button id="zout" aria-label="Zoom Out">&minus;</button><button id="fs">Full Screen</button></div>
 <p id="credit">Terrain and Borders: Natural Earth</p>
 <div id="load">Loading Map</div>
-<script src="app/main.js?v=7"></script>
+<script src="app/main.js?v=8"></script>
+<script src="app/editor.js?v=3"></script>
 </body></html>

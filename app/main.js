@@ -112,6 +112,7 @@ function texture(unit, src) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   const af = gl.getExtension('EXT_texture_filter_anisotropic');
   if (af) gl.texParameterf(gl.TEXTURE_2D, af.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(af.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+  return t;
 }
 function countryMask(topo, visited, states, visitedStates) {
   const size = Math.min(8192, gl.getParameter(gl.MAX_TEXTURE_SIZE));
@@ -215,6 +216,7 @@ const endPtr = ev => {
   if (ptrs.size) { pinch = 0; return; }
   const d = drag; drag = null;
   if (!d || d.moved || ev.type === 'pointercancel') return;
+  if (window.WM && WM.onMapTap && WM.onMapTap(ev.clientX, ev.clientY)) return;
   if (!target) { setMode(true); return; }
   if (tr < 1) return;
   const now = performance.now();
@@ -228,6 +230,8 @@ $('zin').onclick = () => setZoom(tz * 1.8); $('zout').onclick = () => setZoom(tz
 $('fs').onclick = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); };
 addEventListener('keydown', ev => {
   const k = ev.key, step = 60;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+  if (k === 'Escape' && window.WM && WM.closePanel && WM.closePanel()) return;
   if (ev.target.tagName === 'BUTTON' && (k === 'Enter' || k === ' ')) return;
   if (k === 'Enter' || k === ' ') { ev.preventDefault(); setMode(!target); }
   else if (k === 'Escape') setMode(false);
@@ -248,12 +252,22 @@ async function start() {
   const T = {}, mark = n => { T[n] = Math.round(performance.now() - t0); }; mark('fetched');
   program(); grid(); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
   texture(0, img); mark('terrainUpload');
-  const mask = countryMask(topo, new Set(data.visitedCountries), data.visitedStates ? states : null, data.visitedStates || []); mark('maskDrawn');
-  texture(1, mask); mark('maskUpload'); window.__times = T;
+  mark('maskDrawn'); window.__times = T;
   gl.uniform1i(u.ter, 0); gl.uniform1i(u.msk, 1);
-  pins = data.places.map(p => { const lat = rad(p.lat); return { ...p, lon: rad(p.lon), lat, my: mill(lat) }; });
-  const nC = data.visitedCountries.length, nS = (data.visitedStates || []).filter(n => n !== 'District of Columbia').length;
-  $('nC').textContent = nC; $('lC').textContent = `Countries, ${Math.max(0, COUNTRIES - nC)} to Go`; $('nS').textContent = nS; $('lS').textContent = `States, ${50 - nS} to Go`; $('nP').textContent = pins.length;
+  let maskTex = null;
+  const applyData = d => {
+    if (maskTex) gl.deleteTexture(maskTex);
+    maskTex = texture(1, countryMask(topo, new Set(d.visitedCountries), d.visitedStates ? states : null, d.visitedStates || []));
+    pins = d.places.map(p => { const lat = rad(p.lat); return { ...p, lon: rad(p.lon), lat, my: mill(lat) }; });
+    const nC = d.visitedCountries.length, nS = (d.visitedStates || []).filter(n => n !== 'District of Columbia').length;
+    $('nC').textContent = nC; $('lC').textContent = `Countries, ${Math.max(0, COUNTRIES - nC)} to Go`; $('nS').textContent = nS; $('lS').textContent = `States, ${50 - nS} to Go`; $('nP').textContent = pins.length;
+  };
+  window.WM = {
+    topo, states, base: data, applyData, setMode, isFlat: () => target === 1, isSettled: () => tr === target,
+    unproject(x, y) { const lon = (x - fcx - px) / (S * z), m = (fcy + py - y) / (S * z); return [lon * 180 / Math.PI, (Math.atan(Math.exp(m / 1.25)) - Math.PI / 4) / .4 * 180 / Math.PI]; }
+  };
+  applyData(data);
+  window.dispatchEvent(new Event('wm-ready'));
   layout();
   const h = new URLSearchParams(location.hash.slice(1));
   if (h.has('spin')) spin = h.get('spin') !== '0';

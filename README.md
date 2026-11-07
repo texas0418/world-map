@@ -38,6 +38,8 @@ Pins do not color a country by themselves, so a new country needs both a pin and
 
 When you finish, click **Commit changes**.
 
+**The easy way:** once your map is running, tap **+ Add Places** to search for a city, drop a pin or import a Google My Maps file (KMZ or KML). Countries and US states color themselves, and **Privacy** moves a pin to the nearest city so visitors do not see the exact spot. These changes save only in that browser. To publish them, tap **Download Map File** and use that file to replace `data/places.json`. Hiding a pin only protects it once you publish that file, and your repo's old commits still hold earlier versions.
+
 ### 3. Put It Online
 
 In your fork, go to **Settings**, then **Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose the `main` branch and the `/ (root)` folder, then click **Save**.
@@ -75,6 +77,7 @@ Opening `index.html` directly from your files will not work, because browsers bl
 - Your browser needs WebGL 2, which current versions of Chrome, Safari, Firefox and Edge support.
 - Kosovo, Northern Cyprus, Somaliland, Siachen Glacier and the Indian Ocean Territories have no code in the border data, so they cannot be colored yet. You can still add pins there.
 - The terrain goes soft at the deepest zoom.
+- City search covers about 7,300 world cities from Natural Earth. Use Drop Pin for anything else.
 
 ## Credits
 
