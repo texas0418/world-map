@@ -733,6 +733,81 @@
 "name": "Roissy-en-France",
 "lat": 49.005,
 "lon": 2.5189
+},
+{
+"name": "Yosemite National Park",
+"lat": 37.83,
+"lon": -119.5
+},
+{
+"name": "Zion National Park",
+"lat": 37.3,
+"lon": -113.05
+},
+{
+"name": "The Alamo",
+"lat": 29.426,
+"lon": -98.486
+},
+{
+"name": "Disneyland Resort",
+"lat": 33.809,
+"lon": -117.919
+},
+{
+"name": "Epcot",
+"lat": 28.371,
+"lon": -81.55
+},
+{
+"name": "Georgia Aquarium",
+"lat": 33.763,
+"lon": -84.395
+},
+{
+"name": "Golden Gate Bridge",
+"lat": 37.82,
+"lon": -122.479
+},
+{
+"name": "Hollywood, California",
+"lat": 34.102,
+"lon": -118.327
+},
+{
+"name": "Key West",
+"lat": 24.555,
+"lon": -81.782
+},
+{
+"name": "Las Vegas Strip",
+"lat": 36.12,
+"lon": -115.172
+},
+{
+"name": "Myrtle Beach",
+"lat": 33.73,
+"lon": -78.87
+},
+{
+"name": "Pier 39",
+"lat": 37.81,
+"lon": -122.41
+},
+{
+"name": "Pike Place Market",
+"lat": 47.609,
+"lon": -122.342
+},
+{
+"name": "San Antonio River Walk",
+"lat": 29.425,
+"lon": -98.492
+},
+{
+"name": "Times Square",
+"lat": 40.758,
+"lon": -73.986
 }
 ]
 }
