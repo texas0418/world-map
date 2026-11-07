@@ -243,7 +243,7 @@ async function start() {
   const t0 = performance.now();
   if (!gl) { $('load').textContent = 'This Browser Needs WebGL 2 to Show the Globe'; return; }
   const img = new Image(); img.src = 'assets/terrain-8k.jpg';
-  const [topo, data] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json').then(r => r.json()), img.decode()]);
+  const [topo, data] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json', { cache: 'no-cache' }).then(r => r.json()), img.decode()]);
   const T = {}, mark = n => { T[n] = Math.round(performance.now() - t0); }; mark('fetched');
   program(); grid(); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
   texture(0, img); mark('terrainUpload');
