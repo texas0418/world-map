@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>Bench</title><style>iframe{position:fixed;inset:0;width:100%;height:100%;border:0}</style>
+<iframe id="f" src="../index.html?bench=1#spin=1"></iframe><pre id="out"></pre>
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fps = ms => new Promise(r => { const t0 = performance.now(); let n = 0, worst = 0, p = t0; const f = t => { n++; worst = Math.max(worst, t - p); p = t; t - t0 < ms ? requestAnimationFrame(f) : r({ fps: +(n / ms * 1000).toFixed(1), worstMs: Math.round(worst) }); }; requestAnimationFrame(f); });
+(async () => {
+  const w = document.getElementById('f').contentWindow; const R = {};
+  while (!w.__worldMap) await sleep(50);
+  R.loadMs = w.__loadMs; R.stages = w.__times; R.size = [w.innerWidth, w.innerHeight];
+  const g = w.document.getElementById('gl').getContext('webgl2'), d = g.getExtension('WEBGL_debug_renderer_info'); R.renderer = d && g.getParameter(d.UNMASKED_RENDERER_WEBGL);
+  R.globeFps = await fps(2000);
+  w.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter' }));
+  R.morph = await fps(1300); R.afterOpen = w.__worldMap();
+  R.backShown = !w.document.getElementById('back').hidden;
+  w.document.getElementById('zin').click(); w.document.getElementById('zin').click(); w.document.getElementById('zin').click();
+  await sleep(1000); R.afterZoom = w.__worldMap(); R.zoomFps = await fps(1000);
+  w.document.getElementById('back').click(); await sleep(1500); R.afterBack = w.__worldMap(); R.backHidden = w.document.getElementById('back').hidden;
+  fetch('/RESULT?' + encodeURIComponent(JSON.stringify(R)));
+})();
+</script>

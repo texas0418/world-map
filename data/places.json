@@ -1,0 +1,738 @@
+{
+"visitedCountries": [
+"840",
+"124",
+"826",
+"784",
+"578",
+"528",
+"056",
+"710",
+"031",
+"484",
+"076",
+"170",
+"032",
+"458",
+"156",
+"780",
+"276",
+"158",
+"044",
+"188"
+],
+"places": [
+{
+"name": "Penistone",
+"lat": 53.5261,
+"lon": -1.6255
+},
+{
+"name": "Hartlepool",
+"lat": 54.6917,
+"lon": -1.2129
+},
+{
+"name": "Huntly",
+"lat": 57.4459,
+"lon": -2.7878
+},
+{
+"name": "Inverurie",
+"lat": 57.2835,
+"lon": -2.374
+},
+{
+"name": "Aberdeen",
+"lat": 57.1497,
+"lon": -2.0943
+},
+{
+"name": "Edinburgh",
+"lat": 55.9533,
+"lon": -3.1883
+},
+{
+"name": "Kristiansund",
+"lat": 63.1103,
+"lon": 7.7281
+},
+{
+"name": "Hammerfest",
+"lat": 70.6634,
+"lon": 23.682
+},
+{
+"name": "Bergen",
+"lat": 60.3913,
+"lon": 5.3221
+},
+{
+"name": "Antwerp",
+"lat": 51.2213,
+"lon": 4.4051
+},
+{
+"name": "Amsterdam",
+"lat": 52.3676,
+"lon": 4.9041
+},
+{
+"name": "Rotterdam",
+"lat": 51.9244,
+"lon": 4.4777
+},
+{
+"name": "Houston",
+"lat": 29.7604,
+"lon": -95.3698
+},
+{
+"name": "San Antonio",
+"lat": 29.4241,
+"lon": -98.4936
+},
+{
+"name": "Corpus Christi",
+"lat": 27.8006,
+"lon": -97.3964
+},
+{
+"name": "Ingleside",
+"lat": 27.8778,
+"lon": -97.2117
+},
+{
+"name": "Atlanta",
+"lat": 33.749,
+"lon": -84.388
+},
+{
+"name": "Washington",
+"lat": 38.9072,
+"lon": -77.0369
+},
+{
+"name": "Seattle",
+"lat": 47.6062,
+"lon": -122.3321
+},
+{
+"name": "Hollywood",
+"lat": 26.0112,
+"lon": -80.1495,
+"note": "Hard Rock Casino Commercial"
+},
+{
+"name": "Orlando",
+"lat": 28.5384,
+"lon": -81.3789
+},
+{
+"name": "Pensacola",
+"lat": 30.4213,
+"lon": -87.2169
+},
+{
+"name": "Waco",
+"lat": 31.5493,
+"lon": -97.1467
+},
+{
+"name": "Abilene",
+"lat": 32.4487,
+"lon": -99.7331
+},
+{
+"name": "Temple",
+"lat": 31.0982,
+"lon": -97.3428
+},
+{
+"name": "Dallas",
+"lat": 32.7767,
+"lon": -96.797
+},
+{
+"name": "Fort Worth",
+"lat": 32.7555,
+"lon": -97.3308
+},
+{
+"name": "Laredo",
+"lat": 27.5036,
+"lon": -99.5076
+},
+{
+"name": "Nuevo Laredo",
+"lat": 27.4779,
+"lon": -99.5496
+},
+{
+"name": "Del Rio",
+"lat": 29.3709,
+"lon": -100.8959
+},
+{
+"name": "Tucson",
+"lat": 32.2226,
+"lon": -110.9747
+},
+{
+"name": "Phoenix",
+"lat": 33.4484,
+"lon": -112.074
+},
+{
+"name": "Las Vegas",
+"lat": 36.1699,
+"lon": -115.1398
+},
+{
+"name": "Hoover Dam",
+"lat": 36.0161,
+"lon": -114.7377
+},
+{
+"name": "Albuquerque",
+"lat": 35.0844,
+"lon": -106.6504
+},
+{
+"name": "Santa Fe",
+"lat": 35.687,
+"lon": -105.9378
+},
+{
+"name": "El Paso",
+"lat": 31.7619,
+"lon": -106.485
+},
+{
+"name": "San Diego",
+"lat": 32.7157,
+"lon": -117.1611
+},
+{
+"name": "San Francisco",
+"lat": 37.7749,
+"lon": -122.4194
+},
+{
+"name": "Eugene",
+"lat": 44.0521,
+"lon": -123.0868
+},
+{
+"name": "Vancouver",
+"lat": 49.2827,
+"lon": -123.1207
+},
+{
+"name": "Toronto",
+"lat": 43.6532,
+"lon": -79.3832
+},
+{
+"name": "New York",
+"lat": 40.7128,
+"lon": -74.006
+},
+{
+"name": "Bloomfield",
+"lat": 40.8068,
+"lon": -74.1854
+},
+{
+"name": "Philadelphia",
+"lat": 39.9526,
+"lon": -75.1652,
+"note": "Braised Bounty in Chinatown"
+},
+{
+"name": "Baltimore",
+"lat": 39.2904,
+"lon": -76.6122
+},
+{
+"name": "Boston",
+"lat": 42.3601,
+"lon": -71.0589
+},
+{
+"name": "Atlantic City",
+"lat": 39.3643,
+"lon": -74.4229
+},
+{
+"name": "Edison",
+"lat": 40.5187,
+"lon": -74.4121
+},
+{
+"name": "Fredericksburg",
+"lat": 38.3032,
+"lon": -77.4605
+},
+{
+"name": "Luray Caverns",
+"lat": 38.6641,
+"lon": -78.4838
+},
+{
+"name": "Charleston",
+"lat": 32.7765,
+"lon": -79.9311
+},
+{
+"name": "Savannah",
+"lat": 32.0809,
+"lon": -81.0912
+},
+{
+"name": "Blue Fox Ranch",
+"lat": 26.8043,
+"lon": -80.957
+},
+{
+"name": "Hattiesburg",
+"lat": 31.3271,
+"lon": -89.2903
+},
+{
+"name": "Athens",
+"lat": 35.4429,
+"lon": -84.593
+},
+{
+"name": "Asheboro",
+"lat": 35.7079,
+"lon": -79.8136
+},
+{
+"name": "Uwharrie National Forest",
+"lat": 35.3663,
+"lon": -79.964
+},
+{
+"name": "Southern Hops Brewing Co.",
+"lat": 34.1743,
+"lon": -79.832
+},
+{
+"name": "Deerfield Beach",
+"lat": 26.3184,
+"lon": -80.0998
+},
+{
+"name": "South Beach",
+"lat": 25.7826,
+"lon": -80.1341
+},
+{
+"name": "Alligator Alley East",
+"lat": 26.1462,
+"lon": -80.4669
+},
+{
+"name": "Fort Pierce",
+"lat": 27.4467,
+"lon": -80.3256
+},
+{
+"name": "Bronson's Camp Outlaw at Indian Bow",
+"lat": 28.7026,
+"lon": -82.2478
+},
+{
+"name": "Tallahassee",
+"lat": 30.4383,
+"lon": -84.2807
+},
+{
+"name": "Hard Labor Creek State Park",
+"lat": 33.6521,
+"lon": -83.5958
+},
+{
+"name": "Key Largo",
+"lat": 25.0865,
+"lon": -80.4473
+},
+{
+"name": "Cartersville",
+"lat": 34.1651,
+"lon": -84.7999
+},
+{
+"name": "Biloxi",
+"lat": 30.396,
+"lon": -88.8853
+},
+{
+"name": "Mobile",
+"lat": 30.6954,
+"lon": -88.0399
+},
+{
+"name": "Fairhope",
+"lat": 30.523,
+"lon": -87.9033
+},
+{
+"name": "Theodore",
+"lat": 30.5477,
+"lon": -88.1753
+},
+{
+"name": "Pascagoula",
+"lat": 30.3658,
+"lon": -88.5561
+},
+{
+"name": "New Orleans",
+"lat": 29.9511,
+"lon": -90.0715
+},
+{
+"name": "Golden Meadow",
+"lat": 29.3791,
+"lon": -90.2601
+},
+{
+"name": "Port Fourchon",
+"lat": 29.1056,
+"lon": -90.1944
+},
+{
+"name": "Morgan City",
+"lat": 29.6994,
+"lon": -91.2068
+},
+{
+"name": "Lafayette",
+"lat": 30.2241,
+"lon": -92.0198
+},
+{
+"name": "New Iberia",
+"lat": 30.0035,
+"lon": -91.8187
+},
+{
+"name": "Lake Charles",
+"lat": 30.2266,
+"lon": -93.2174
+},
+{
+"name": "Beaumont",
+"lat": 30.0802,
+"lon": -94.1266
+},
+{
+"name": "Port Arthur",
+"lat": 29.885,
+"lon": -93.9399
+},
+{
+"name": "Port Aransas",
+"lat": 27.8339,
+"lon": -97.0611
+},
+{
+"name": "Port Isabel",
+"lat": 26.0734,
+"lon": -97.2086
+},
+{
+"name": "Shreveport",
+"lat": 32.5252,
+"lon": -93.7502
+},
+{
+"name": "Nacogdoches",
+"lat": 31.6039,
+"lon": -94.656
+},
+{
+"name": "Cedar Rapids",
+"lat": 41.9779,
+"lon": -91.6656
+},
+{
+"name": "Chicago",
+"lat": 41.8781,
+"lon": -87.6298
+},
+{
+"name": "Nashville",
+"lat": 36.1627,
+"lon": -86.7816,
+"note": "Hazel Hart Deloitte Commercial"
+},
+{
+"name": "Memphis",
+"lat": 35.1495,
+"lon": -90.049
+},
+{
+"name": "Reading",
+"lat": 40.3356,
+"lon": -75.9269
+},
+{
+"name": "Grand Canyon",
+"lat": 36.0998,
+"lon": -112.1125
+},
+{
+"name": "Mount Rushmore National Memorial",
+"lat": 43.8791,
+"lon": -103.4591
+},
+{
+"name": "Yellowstone National Park",
+"lat": 44.428,
+"lon": -110.5885
+},
+{
+"name": "Portland",
+"lat": 45.5152,
+"lon": -122.6784
+},
+{
+"name": "Vancouver Island",
+"lat": 49.6506,
+"lon": -125.4494
+},
+{
+"name": "Veracruz",
+"lat": 19.2602,
+"lon": -96.5783
+},
+{
+"name": "Cancún",
+"lat": 21.1619,
+"lon": -86.8515
+},
+{
+"name": "The Bahamas",
+"lat": 25.0343,
+"lon": -77.3963
+},
+{
+"name": "Tamarindo Beach Costa Rica",
+"lat": 10.3019,
+"lon": -85.8411
+},
+{
+"name": "Medellín",
+"lat": 6.2476,
+"lon": -75.5658
+},
+{
+"name": "Jardín",
+"lat": 5.5988,
+"lon": -75.8198
+},
+{
+"name": "State of Rio de Janeiro",
+"lat": -22.3534,
+"lon": -42.7076
+},
+{
+"name": "Vitoria",
+"lat": -20.3197,
+"lon": -40.3385
+},
+{
+"name": "Buenos Aires",
+"lat": -34.6037,
+"lon": -58.3816
+},
+{
+"name": "Rio Grande",
+"lat": -53.786,
+"lon": -67.7002
+},
+{
+"name": "Cape Town",
+"lat": -33.9249,
+"lon": 18.4241
+},
+{
+"name": "Gqeberha",
+"lat": -33.9608,
+"lon": 25.6022
+},
+{
+"name": "Dubai",
+"lat": 25.2048,
+"lon": 55.2708
+},
+{
+"name": "Baku",
+"lat": 40.4093,
+"lon": 49.8671
+},
+{
+"name": "College Station",
+"lat": 30.628,
+"lon": -96.3344
+},
+{
+"name": "Bryan",
+"lat": 30.6744,
+"lon": -96.37
+},
+{
+"name": "Taiwan",
+"lat": 23.6978,
+"lon": 120.9605
+},
+{
+"name": "Beijing",
+"lat": 39.9042,
+"lon": 116.4074
+},
+{
+"name": "Shanghai",
+"lat": 31.2304,
+"lon": 121.4737
+},
+{
+"name": "Denver",
+"lat": 39.7392,
+"lon": -104.9903
+},
+{
+"name": "Salt Lake City",
+"lat": 40.7608,
+"lon": -111.891
+},
+{
+"name": "Mount Rainier",
+"lat": 46.8523,
+"lon": -121.7603
+},
+{
+"name": "The Hamptons",
+"lat": 40.9246,
+"lon": -72.3548
+},
+{
+"name": "Galveston",
+"lat": 29.3013,
+"lon": -94.7977
+},
+{
+"name": "Maassluis",
+"lat": 51.9226,
+"lon": 4.2546
+},
+{
+"name": "Hammond",
+"lat": 41.5834,
+"lon": -87.5
+},
+{
+"name": "Frankfurt",
+"lat": 50.1109,
+"lon": 8.6821
+},
+{
+"name": "Port of Spain",
+"lat": 10.6603,
+"lon": -61.5086
+},
+{
+"name": "Las Cruces",
+"lat": 32.3199,
+"lon": -106.7637
+},
+{
+"name": "Truth or Consequences",
+"lat": 33.1284,
+"lon": -107.2528
+},
+{
+"name": "Carlsbad",
+"lat": 32.4207,
+"lon": -104.2288
+},
+{
+"name": "Roswell",
+"lat": 33.3943,
+"lon": -104.523
+},
+{
+"name": "Silver City",
+"lat": 32.7701,
+"lon": -108.2803
+},
+{
+"name": "Gila National Forest",
+"lat": 33.3748,
+"lon": -108.3759
+},
+{
+"name": "Odessa",
+"lat": 31.8457,
+"lon": -102.3676
+},
+{
+"name": "Austin",
+"lat": 30.2672,
+"lon": -97.7431
+},
+{
+"name": "Carlsbad Caverns National Park",
+"lat": 32.1291,
+"lon": -104.5539
+},
+{
+"name": "Gila Cliff Dwellings National Monument",
+"lat": 33.2267,
+"lon": -108.2722
+},
+{
+"name": "White Sands National Park",
+"lat": 32.7872,
+"lon": -106.3257
+},
+{
+"name": "Columbia",
+"lat": 34.0007,
+"lon": -81.0348,
+"note": "Stuntgirl"
+},
+{
+"name": "Chattanooga",
+"lat": 35.0458,
+"lon": -85.3094,
+"note": "Chinese Food Music Video"
+},
+{
+"name": "Winston-Salem",
+"lat": 36.0999,
+"lon": -80.2442,
+"note": "O&0"
+},
+{
+"name": "Stone Mountain Park",
+"lat": 33.8123,
+"lon": -84.142,
+"note": "Stone"
+},
+{
+"name": "Spartanburg",
+"lat": 34.9516,
+"lon": -81.9327
+},
+{
+"name": "Kota Kinabalu",
+"lat": 5.9858,
+"lon": 116.073
+}
+]
+}

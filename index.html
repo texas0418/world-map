@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My World Travels</title><meta name="description" content="A turning globe of every country and city I have been to."><link rel="stylesheet" href="app/style.css?v=4"></head>
+<body>
+<canvas id="bg"></canvas><canvas id="gl" tabindex="0" aria-label="Interactive globe of visited places. Tap or press Enter to open the flat map."></canvas><canvas id="fg"></canvas>
+<div id="panel"><h1>My World Travels</h1>
+<div class="stats"><div><b id="nC"></b><span>Countries</span></div><div><b id="nP"></b><span>Places</span></div></div></div>
+<div id="tip" hidden></div>
+<div id="ctl"><button id="back" hidden>Back to Globe</button><button id="zin" aria-label="Zoom In">+</button><button id="zout" aria-label="Zoom Out">&minus;</button><button id="fs">Full Screen</button></div>
+<p id="credit">Terrain and Borders: Natural Earth</p>
+<div id="load">Loading Map</div>
+<script src="app/main.js?v=3"></script>
+</body></html>

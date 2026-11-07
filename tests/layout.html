@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>Layout Test</title><body style="margin:0">
+<script>
+const sizes = [[1512,780],[1512,700],[1440,800],[1280,640],[1024,768],[1920,1080],[3840,2160],[844,390],[390,844]];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hit = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+const box = b => [b.left, b.top, b.right, b.bottom].map(Math.round);
+(async () => {
+  const out = [];
+  for (const [w, h] of sizes) for (const flat of [0, 1]) {
+    const f = document.createElement('iframe'); f.style.cssText = `width:${w}px;height:${h}px;border:0;position:absolute;left:0;top:0`;
+    f.src = '../index.html?layout=' + Date.now(); document.body.append(f);
+    await new Promise(r => f.onload = r); const d = f.contentDocument;
+    d.getElementById('load').style.display = 'none'; d.getElementById('nC').textContent = '20'; d.getElementById('nP').textContent = '141';
+    d.body.classList.toggle('flat', !!flat); d.getElementById('back').hidden = !flat; await sleep(60);
+    const r = id => d.querySelector(id).getBoundingClientRect();
+    const bad = []; const texts = ['#panel h1', '.stats div:nth-child(1)', '.stats div:nth-child(2)'];
+    for (const t of texts) for (const c of ['#ctl', '#credit']) if (hit(r(t), r(c))) bad.push(t + ' x ' + c);
+    if (hit(r('#ctl'), r('#credit'))) bad.push('ctl x credit');
+    const off = texts.filter(t => r(t).right > w || r(t).left < 0 || r(t).top < 0 || r(t).bottom > h);
+    out.push(w + 'x' + h + ' ' + (flat ? 'flat' : 'globe') + ': ' + (bad.concat(off).join('; ') || 'ok'));
+    f.remove();
+  }
+  await fetch('/LAYOUT?' + encodeURIComponent(JSON.stringify(out)));
+})();
+</script>
