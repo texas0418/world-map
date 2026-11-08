@@ -145,7 +145,7 @@ function countryMask(topo, visited, states, visitedStates) {
 function drawBg() {
   bgx.setTransform(1, 0, 0, 1, 0, 0); bgx.globalAlpha = 1;
   if (e >= 1) { bgx.fillStyle = '#04080f'; bgx.fillRect(0, 0, bg.width, bg.height); return; }
-  bgx.drawImage(stars, 0, 0);
+  if (stars && stars.width && stars.height) bgx.drawImage(stars, 0, 0);
   bgx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const r = R * z, g = bgx.createRadialGradient(gx, gy, r * .92, gx, gy, r * 1.14);
   g.addColorStop(0, `rgba(110,178,232,${.5 * (1 - e)})`); g.addColorStop(1, 'rgba(110,178,232,0)');
@@ -197,14 +197,14 @@ function drawPins(now) {
 }
 let last = 0;
 function frame(now) {
+  requestAnimationFrame(frame);
   const dt = Math.min(.05, (now - last) / 1000 || 0); last = now;
   if (tr !== target) { tr = target > tr ? Math.min(target, tr + dt / 1.2) : Math.max(target, tr - dt / 1.2); }
   e = ease(tr);
   if (Math.abs(tz - z) > .0005) zoomTo(z + (tz - z) * (1 - Math.exp(-dt * 11)), ax, ay);
   if (tr === 0 && target === 0 && !drag && !reduced && spin) lam -= dt * rad(4.5);
   if (window.WM && WM.onFrame) WM.onFrame(dt);
-  drawAll(now);
-  requestAnimationFrame(frame);
+  if (W && H) drawAll(now);
 }
 function drawAll(now) {
   gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
