@@ -1,9 +1,9 @@
 'use strict';
 (() => {
 const $ = id => document.getElementById(id), KEY = 'wm-edits-v1';
-let E = { added: [], hide: {}, hideNew: false, countries: [] }, cities = null, geo = null, tab = 's', dropAt = null, dropMode = false;
+let E = { added: [], hide: {}, hideNew: false, countries: [], edits: {} }, cities = null, geo = null, tab = 's', dropAt = null, dropMode = false;
 try { E = Object.assign(E, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(E)); } catch (e) {} };
+const save = () => { if (WM.readOnly) return; try { localStorage.setItem(KEY, JSON.stringify(E)); } catch (e) {} };
 const el = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; };
 const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
@@ -45,16 +45,18 @@ function effective() {
   const all = [...WM.base.places, ...E.added.filter(p => !baseNames.has(p.name))];
   for (const p of all) {
     if (E.hide[p.name] && cities) { const c = nearestCity(p.lat, p.lon); out.places.push({ name: cityLabel(c), lat: c[4], lon: c[5] }); continue; }
-    const q = { name: p.name, lat: p.lat, lon: p.lon }; if (p.note && !E.hide[p.name]) q.note = p.note; out.places.push(q);
+    const q = { ...p, ...(E.edits[p.name] || {}) }; for (const k in q) if (q[k] === '' || q[k] == null) delete q[k]; out.places.push(q);
   }
   const addC = id => { if (id && !out.visitedCountries.includes(id)) out.visitedCountries.push(id); };
   E.countries.forEach(addC);
   for (const p of E.added) {
-    if (baseNames.has(p.name)) continue;
+    if (baseNames.has(p.name) || (E.edits[p.name] || {}).status === 'want') continue;
     const at = locate(p.lat, p.lon); addC(at.country);
     if (at.state && out.visitedStates && !out.visitedStates.includes(at.state)) out.visitedStates.push(at.state);
   }
   if (out.visitedStates) out.visitedStates.sort();
+  if (WM.base.theme) out.theme = WM.base.theme;
+  if (E.theme) out.theme = E.theme;
   const seen = new Set(); out.places = out.places.filter(p => { const k = p.name + p.lat + p.lon; if (seen.has(k)) return false; seen.add(k); return true; });
   return out;
 }
@@ -69,7 +71,7 @@ async function addPin(name, lat, lon, region) {
   if (E.hideNew) { await loadCities(); E.hide[name] = true; }
   return true;
 }
-function renderSaveNote() { $('dl').disabled = !E.added.length && !Object.keys(E.hide).length && !E.countries.length; }
+function renderSaveNote() { $('dl').disabled = !E.added.length && !Object.keys(E.hide).length && !E.countries.length && !Object.keys(E.edits).length && !E.theme; }
 function renderYours() {
   const y = $('yours'); y.textContent = ''; $('yoursH').hidden = !E.added.length;
   for (const p of [...E.added].reverse()) {
@@ -90,13 +92,16 @@ async function renderResults() {
     const r = el('div', 'row'), d = el('div', '', c[1]); d.append(el('small', '', [c[2], c[3]].filter(Boolean).join(', ')));
     const has = onMap(c[1], c[4], c[5]), b = el('button', 'act' + (has ? '' : ' go'), has ? 'On Your Map' : 'Add Pin'); b.disabled = has;
     b.onclick = async () => { if (await addPin(c[1], c[4], c[5], c[2] || c[3])) { commit(); $('q').value = ''; box.textContent = ''; } };
-    r.append(d, b); box.append(r);
+    r.append(d, b);
+    if (!has) { const w = el('button', 'act', 'Want'); w.setAttribute('aria-label', 'Add ' + c[1] + ' to want to go'); w.onclick = async () => { if (await addPin(c[1], c[4], c[5], c[2] || c[3])) { const a = E.added[E.added.length - 1]; E.edits[a.name] = { ...(E.edits[a.name] || {}), status: 'want' }; commit(); $('q').value = ''; box.textContent = ''; } }; r.append(w); }
+    box.append(r);
   }
 }
 function setTab(t) {
   tab = t; document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x.dataset.t === t));
-  for (const k of 'sip') $(k).hidden = k !== t;
+  for (const k of 'sipd') $(k).hidden = k !== t;
   if (t === 'p') renderPrivacy();
+  if (t === 'd' && WM.renderPins) WM.renderPins();
 }
 async function renderPrivacy() {
   await loadCities(); const box = $('plist'), v = norm($('pq').value); box.textContent = '';
@@ -172,10 +177,12 @@ async function importFile(file) {
   const f = el('div', 'save'); f.append(el('span', '', 'Routes and lines are ignored.'), go); box.append(f);
 }
 function openPanel(v) { $('ed').hidden = !v; if (v) { loadCities(); if (tab === 's') $('q').focus(); } }
-function startDrop() { dropMode = true; openPanel(false); $('addOpen').hidden = true; $('dropMsg').hidden = false; WM.setMode(true); }
-function endDrop(reopen) { dropMode = false; $('dropMsg').hidden = true; $('addOpen').hidden = false; if (reopen) openPanel(true); }
+function startDrop() { $('statsOpen').hidden = true; dropMode = true; openPanel(false); $('addOpen').hidden = true; $('dropMsg').hidden = false; WM.setMode(true); }
+function endDrop(reopen) { $('statsOpen').hidden = false; dropMode = false; $('dropMsg').hidden = true; $('addOpen').hidden = false; if (reopen) openPanel(true); }
 function boot() {
-  WM.closePanel = () => { if (dropMode) { endDrop(true); return true; } if (!$('ed').hidden) { openPanel(false); return true; } return false; };
+  WM.locate = locate; WM.countryName = id => (geo.find(g => g.id === id) || {}).name || '';
+  $('addOpen').addEventListener('click', () => { WM.closeStats && WM.closeStats(); });
+  WM.closePanel = () => { if (dropMode) { endDrop(true); return true; } if (WM.closeStats && WM.closeStats()) return true; if (!$('ed').hidden) { openPanel(false); return true; } return false; };
   WM.onMapTap = (x, y) => {
     if (!dropMode) return false; if (!WM.isFlat() || !WM.isSettled()) return true;
     const [lon, lat] = WM.unproject(x, y); dropAt = { lat: +lat.toFixed(4), lon: +lon.toFixed(4) }; endDrop(true); setTab('s'); $('namef').hidden = false;
@@ -188,8 +195,10 @@ function boot() {
   $('file').onchange = e => { if (e.target.files[0]) importFile(e.target.files[0]); };
   $('hideAll').onclick = () => { E.hideNew = !E.hideNew; save(); $('hideAll').setAttribute('aria-checked', E.hideNew); };
   $('dl').onclick = async () => { await loadCities(); const a = el('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(effective(), null, 0)], { type: 'application/json' })); a.download = 'places.json'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+  WM.ed = { E: () => E, commit, all: () => { const n = new Set(WM.base.places.map(p => p.name)); return [...WM.base.places, ...E.added.filter(p => !n.has(p.name))]; }, setTab };
+  if (WM.readOnly) { E = { added: [], hide: {}, hideNew: false, countries: [], edits: {} }; window.__wmEffective = effective; return; }
   const hasHide = Object.keys(E.hide).length;
-  (hasHide ? loadCities() : Promise.resolve()).then(() => { if (E.added.length || hasHide || E.countries.length) WM.applyData(effective()); renderYours(); renderSaveNote(); });
+  (hasHide ? loadCities() : Promise.resolve()).then(() => { if (E.added.length || hasHide || E.countries.length || Object.keys(E.edits).length) WM.applyData(effective()); renderYours(); renderSaveNote(); });
   window.__wmEffective = effective;
 }
 window.WM ? boot() : addEventListener('wm-ready', boot, { once: true });

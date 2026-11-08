@@ -16,7 +16,7 @@ const box = b => [b.left, b.top, b.right, b.bottom].map(Math.round);
     const bad = []; const texts = ['#panel h1', '.stats div:nth-child(1)', '.stats div:nth-child(2)', '.stats div:nth-child(3)'];
     for (const t of texts) for (const c of ['#ctl', '#credit']) if (hit(r(t), r(c))) bad.push(t + ' x ' + c);
     if (hit(r('#ctl'), r('#credit'))) bad.push('ctl x credit');
-    for (const q of texts.concat('#ctl')) if (hit(r(q), r('#addOpen'))) bad.push(q + ' x add');
+    for (const q of texts.concat('#ctl')) if (hit(r(q), r('#top'))) bad.push(q + ' x add');
     const off = texts.filter(t => r(t).right > w || r(t).left < 0 || r(t).top < 0 || r(t).bottom > h);
     out.push(w + 'x' + h + ' ' + (flat ? 'flat' : 'globe') + ': ' + (bad.concat(off).join('; ') || 'ok'));
     f.remove();

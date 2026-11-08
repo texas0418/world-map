@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>My World Travels</title><meta name="description" content="A turning globe of every country and city I have been to."><link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="app/style.css?v=7"></head>
+<title>My World Travels</title><meta name="description" content="A turning globe of every country and city I have been to."><link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="app/style.css?v=10"></head>
 <body>
 <canvas id="bg"></canvas><canvas id="gl" tabindex="0" aria-label="Interactive globe of visited places. Tap or press Enter to open the flat map."></canvas><canvas id="fg"></canvas>
 <div id="panel"><h1>My World Travels</h1>
 <div class="stats"><div><b id="nC"></b><span id="lC">Countries</span></div><div><b id="nS"></b><span id="lS">States</span></div><div><b id="nP"></b><span>Places</span></div></div></div>
-<button id="addOpen">+ Add Places</button>
+<div id="top"><button id="addOpen">+ Add Places</button><button id="statsOpen">Stats</button><button id="optOpen">Options</button></div>
+<aside id="st" hidden aria-label="Travel stats"><div class="edh"><h2>Travel Stats</h2><button id="stClose" aria-label="Close stats">&times;</button></div><div id="stBody"></div></aside>
 <aside id="ed" hidden aria-label="Add places"><div class="edh"><h2>Add Places</h2><button id="edClose" aria-label="Close Add Places">&times;</button></div>
-<div class="tabs" role="tablist"><button role="tab" data-t="s" aria-selected="true">Search</button><button role="tab" data-t="i" aria-selected="false">Import File</button><button role="tab" data-t="p" aria-selected="false">Privacy</button></div>
+<div class="tabs" role="tablist"><button role="tab" data-t="s" aria-selected="true">Search</button><button role="tab" data-t="i" aria-selected="false">Import File</button><button role="tab" data-t="d" aria-selected="false">Pins</button><button role="tab" data-t="p" aria-selected="false">Privacy</button></div>
 <section id="s"><input id="q" class="field" type="search" placeholder="Search a City" aria-label="Search a city" autocomplete="off"><div id="res"></div>
 <h3>Or Drop a Pin</h3><div class="row"><div>Tap Anywhere on the Flat Map<small>Name it yourself, for places search does not find</small></div><button id="drop" class="act">Drop Pin</button></div>
 <form id="namef" hidden><h3>Name This Pin</h3><div class="namer"><input id="pinName" class="field" type="text" maxlength="80" aria-label="Pin name"><button class="act go">Add Pin</button></div></form>
@@ -15,12 +16,29 @@
 <section id="i" hidden><label class="drop" id="dz"><b>Choose a Google My Maps File</b>KMZ or KML. It stays on this device.<input id="file" type="file" accept=".kmz,.kml"></label><div id="imp"></div></section>
 <section id="p" hidden><div class="row"><div>Hide Exact Location<small>New pins move to the nearest city, and the name goes with it</small></div><button id="hideAll" class="sw" role="switch" aria-checked="false" aria-label="Hide exact location on new pins"></button></div>
 <input id="pq" class="field" type="search" placeholder="Find a Pin to Hide" aria-label="Find a pin to hide" autocomplete="off"><div id="plist"></div></section>
+<section id="d" hidden><input id="dq" class="field" type="search" placeholder="Find a Pin" aria-label="Find a pin" autocomplete="off"><div id="dlist"></div>
+<form id="pinf" hidden><h3 id="pinfH"></h3><label class="fl" for="fNote">Note</label><input id="fNote" class="field" maxlength="140" autocomplete="off"><label class="fl" for="fCat">Category</label><select id="fCat" class="field"></select><label class="fl" for="fDate">Date (Year or Year-Month)</label><input id="fDate" class="field" maxlength="7" placeholder="2024-06" inputmode="numeric" autocomplete="off"><label class="fl" for="fTrip">Trip Name, for Flight Arcs</label><input id="fTrip" class="field" maxlength="60" autocomplete="off"><label class="row"><span>Want to Go, Not Been Yet</span><input id="fWant" type="checkbox"></label><label class="fl" for="fPh">Photos, Kept Only on This Device</label><input id="fPh" type="file" accept="image/*" multiple><div id="thumbs"></div><div class="save"><button type="button" id="fCancel" class="act">Cancel</button><button class="act go">Save Pin</button></div></form></section>
 <div class="save"><span id="saveNote">Saved on this device. To update your public site, download the map file and put it on your site.</span><button id="dl" class="act">Download Map File</button></div></aside>
+<aside id="op" hidden aria-label="Options"><div class="edh"><h2>Options</h2><button id="opClose" aria-label="Close options">&times;</button></div>
+<div class="row"><div>Replay Your Travels<small id="rpNote">Pins light up in order</small></div><button id="rpGo" class="act go">Play</button></div>
+<div class="row"><div>Day and Night<small>Real sunlight right now, with city lights on the dark side</small></div><button id="swDn" class="sw" role="switch" aria-checked="false" aria-label="Day and night"></button></div>
+<div class="row"><div>Flight Arcs<small id="arcNote">Connects pins that share a trip name</small></div><button id="swArc" class="sw" role="switch" aria-checked="false" aria-label="Flight arcs"></button></div>
+<div class="row"><div>Provinces<small>Colors only the regions with a pin, outside the US too</small></div><button id="swReg" class="sw" role="switch" aria-checked="false" aria-label="Provinces"></button></div>
+<div class="row"><div>Ambient Music<small>Generated in your browser</small></div><button id="swMu" class="sw" role="switch" aria-checked="false" aria-label="Ambient music"></button></div>
+<div class="row"><label for="opTheme">Color Theme</label><select id="opTheme" class="field sm"></select></div>
+<div class="row"><label for="opCat">Show Pins</label><select id="opCat" class="field sm"></select></div>
+<div class="row"><div>Poster<small>A 4K image of this view</small></div><button id="opPoster" class="act">Download</button></div>
+<div class="row"><div>Share Link<small>Read-only copy. Anyone with the link sees your places. Photos are not included.</small></div><button id="opShare" class="act">Copy Link</button></div><input id="shareOut" class="field" hidden readonly aria-label="Share link"></aside>
+<div id="rpMsg" hidden><b id="rpName"></b><small id="rpSub"></small><button id="rpStop" class="act">Stop</button></div>
+<div id="lb" hidden role="dialog" aria-label="Photos"><img id="lbImg" alt=""><div id="lbBar"><span id="lbName"></span><span><button id="lbPrev" class="act">Previous</button> <button id="lbNext" class="act">Next</button> <button id="lbClose" class="act">Close</button></span></div></div>
 <div id="dropMsg" hidden>Tap the map where the pin goes. <button id="dropX" class="act">Cancel</button></div>
 <div id="tip" hidden></div>
 <div id="ctl"><button id="back" hidden>Back to Globe</button><button id="zin" aria-label="Zoom In">+</button><button id="zout" aria-label="Zoom Out">&minus;</button><button id="fs">Full Screen</button></div>
-<p id="credit">Terrain and Borders: Natural Earth</p>
+<p id="credit">Terrain and Borders: Natural Earth. City Lights: NASA</p>
 <div id="load">Loading Map</div>
-<script src="app/main.js?v=13"></script>
-<script src="app/editor.js?v=3"></script>
+<script src="app/main.js?v=16"></script>
+<script src="app/editor.js?v=6"></script>
+<script src="app/stats.js?v=2"></script>
+<script src="app/pins.js?v=1"></script>
+<script src="app/options.js?v=2"></script>
 </body></html>

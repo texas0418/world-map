@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>Stats Test</title><style>iframe{position:fixed;inset:0;width:100%;height:100%;border:0}</style><iframe id="f" src="../index.html?s=1#spin=0"></iframe>
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms)), R = {};
+(async () => { try { const w = document.getElementById('f').contentWindow; let n = 0; while (!(w.WM && w.WM.openStats) && n++ < 400) await sleep(50); const d = document.getElementById('f').contentDocument, $ = i => d.getElementById(i);
+ R.hiddenAtStart = $('st').hidden; await sleep(300); $('statsOpen').click(); await sleep(150); R.opens = !$('st').hidden; R.text = $('stBody').innerText.replace(/\n+/g, ' | ').slice(0, 900); R.s = { c: w.__stats.nC, st: w.__stats.nS, cont: w.__stats.cont, on: w.__stats.B.filter(b => b[1]).map(b => b[0]) };
+ $('stClose').click(); R.xCloses = $('st').hidden; $('statsOpen').click(); w.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape' })); R.escCloses = $('st').hidden; $('statsOpen').click(); $('statsOpen').click(); R.toggle = $('st').hidden;
+ $('statsOpen').click(); $('addOpen').click(); await sleep(50); R.addClosesStats = $('st').hidden && !$('ed').hidden; $('statsOpen').click(); R.statsClosesAdd = !$('st').hidden && $('ed').hidden;
+ const cur = JSON.parse(JSON.stringify(w.WM.current)); cur.visitedCountries.push('036'); cur.places.push({ name: 'Sydney', lat: -33.87, lon: 151.21 }, { name: 'McMurdo', lat: -77.85, lon: 166.67 }); w.WM.applyData(cur); await sleep(200);
+ R.after = { cont: w.__stats.cont, on: w.__stats.B.filter(b => b[1]).length, six: w.__stats.B.find(b => b[0] === 'Six Continents')[1], south: w.__stats.ext.South.name, east: w.__stats.ext.East.name, ant: w.__stats.B.find(b => b[0] === 'Antarctic Circle')[1], live: !!$('stBody').innerText.includes('McMurdo') };
+ R.savedNothing = w.localStorage.getItem('wm-edits-v1');
+} catch (e) { R.error = String(e && e.stack || e).slice(0, 300); } fetch('/STATS?' + encodeURIComponent(JSON.stringify(R))); })();
+</script>

@@ -52,6 +52,21 @@ Edit `data/places.json` again and commit. Your site updates by itself within a f
 
 The counts on the map show how many you have left, out of 195 countries and 50 states. To use a different country total, change `COUNTRIES` at the top of `app/main.js`.
 
+## More Things You Can Do
+
+Under **+ Add Places**, the **Pins** tab lets you give any pin a note, category, date, trip name or photos, or mark it Want to Go. Want to Go pins show as hollow rings and do not count toward your totals. Photos stay in that browser and are never put in the map file or a share link.
+
+The **Options** button has:
+
+- **Replay:** pins light up in date order, then list order for pins with no date
+- **Day and Night:** real sunlight right now, with city lights on the dark side
+- **Flight Arcs:** lines between pins that share a trip name, in date order
+- **Provinces:** colors only the regions with a pin in countries you have visited
+- **Ambient Music:** made in your browser, with no audio files
+- **Color Theme** and **Show Pins** filters
+- **Poster:** a 4K image of the current view
+- **Share Link:** a read-only copy of your map inside the link itself
+
 ## Change the Title
 
 The title appears twice in `index.html`: once in `<title>` and once in `<h1>`. Edit both.
@@ -62,6 +77,7 @@ The title appears twice in `index.html`: once in `<title>` and once in `<h1>`. E
 - **Back to the globe:** the Back to Globe button, or press Esc
 - **Zoom:** scroll, pinch, the + and - buttons, or the + and - keys. City names appear as you zoom in
 - **Move around:** drag, or use the arrow keys
+- **Stats:** the Stats button shows your farthest points, how much you have seen and the badges you have earned
 - **Full screen:** the Full Screen button, or press F
 
 ## Run It on Your Computer
@@ -81,7 +97,7 @@ Opening `index.html` directly from your files will not work, because browsers bl
 
 ## Credits
 
-Terrain and borders come from Natural Earth (public domain), with borders packaged by the world-atlas project.
+Terrain and borders come from Natural Earth (public domain), with borders packaged by the world-atlas project. City lights come from NASA Earth Observatory (Black Marble 2016).
 
 ## License
 

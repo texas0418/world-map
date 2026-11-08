@@ -11,12 +11,13 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let W = 0, H = 0, dpr = 1, gx = 0, gy = 0, R = 0, S = 0, fcx = 0, fcy = 0;
 let tr = 0, target = 0, e = 0, lam = rad(-45), tilt = rad(22), z = 1, tz = 1, ax = 0, ay = 0, px = 0, py = 0;
 const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) <= 900 || /(^|[#&])lite=1/.test(location.hash);
+const V = { filter: null, maxRank: null, arcs: false, regions: null, core: '#fff6dc', glow: '#ffd98a', cats: {} };
 let pins = [], u = {}, indexCount = 0, stars = null, ready = false;
 
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-function layout() {
-  W = innerWidth; H = innerHeight; dpr = Math.min(devicePixelRatio || 1, 2);
+function layout(w, h, d) {
+  W = w || innerWidth; H = h || innerHeight; dpr = d || Math.min(devicePixelRatio || 1, 2);
   for (const c of [glc, bg, fg]) { c.width = W * dpr; c.height = H * dpr; }
   gl.viewport(0, 0, glc.width, glc.height);
   if (W >= H) { R = Math.min(H * .44, W * .3); gx = W * .34; gy = H / 2; }
@@ -72,19 +73,20 @@ void main(){
   uv=vec2((a.x+PI)/(2.*PI),(PI/2.-a.y)/PI); n=g;
 }`;
 const FS = `#version 300 es
-precision highp float; in vec2 uv; in vec2 n; uniform sampler2D ter,msk; uniform float e,relief; out vec4 o;
+precision highp float; in vec2 uv; in vec2 n; uniform sampler2D ter,msk,lit; uniform float e,relief,dn; uniform vec3 cGold,cLand,cSea,cSea2,sun; out vec4 o;
 void main(){
   float t=texture(ter,uv).r;
   vec3 m=texture(msk,uv).rgb;
   float k=clamp(1.+(t-.67)*4.6*relief,.34,1.32);
-  vec3 sea=mix(vec3(.015,.05,.11),vec3(.06,.17,.29),smoothstep(.28,.44,t));
-  vec3 land=vec3(.17,.25,.33)*k;
-  vec3 gold=vec3(.86,.58,.21)*k;
+  vec3 sea=mix(cSea,cSea2,smoothstep(.28,.44,t));
+  vec3 land=cLand*k;
+  vec3 gold=cGold*k;
   vec3 c=mix(sea,mix(land,gold,m.g),m.r);
   c=mix(c,mix(vec3(.5,.62,.74),vec3(1.,.93,.74),m.g),m.b*.55);
   vec3 N=vec3(n,sqrt(max(0.,1.-dot(n,n))));
   float d=max(dot(N,normalize(vec3(-.35,.45,.82))),0.);
   c*=mix(.5+.72*d,1.,e);
+  if(dn>0.){float lon=uv.x*6.2831853-3.14159265,lat=1.57079633-uv.y*3.14159265;vec3 Wn=vec3(cos(lat)*cos(lon),cos(lat)*sin(lon),sin(lat));float night=smoothstep(.12,-.12,dot(Wn,sun))*dn;c=mix(c,c*.16,night)+texture(lit,uv).rgb*vec3(1.,.86,.58)*night*1.15;}
   o=vec4(c,1.);
 }`;
 function program() {
@@ -92,7 +94,7 @@ function program() {
   const p = gl.createProgram(); gl.attachShader(p, mk(gl.VERTEX_SHADER, VS)); gl.attachShader(p, mk(gl.FRAGMENT_SHADER, FS));
   gl.bindAttribLocation(p, 0, 'a'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
   gl.useProgram(p);
-  for (const n of ['e', 'lam', 'f0', 'R', 'S', 'gc', 'fc', 'res', 'ter', 'msk', 'relief']) u[n] = gl.getUniformLocation(p, n);
+  for (const n of ['e', 'lam', 'f0', 'R', 'S', 'gc', 'fc', 'res', 'ter', 'msk', 'relief', 'lit', 'dn', 'cGold', 'cLand', 'cSea', 'cSea2', 'sun']) u[n] = gl.getUniformLocation(p, n);
 }
 function grid() {
   const NX = 360, NY = 180, v = new Float32Array((NX + 1) * (NY + 1) * 2), idx = new Uint16Array(NX * NY * 6);
@@ -132,10 +134,11 @@ function countryMask(topo, visited, states, visitedStates) {
     for (const s of shifts) { un.forEach((p, i) => { const X = (p[0] + s + 180) * k, Y = (90 - p[1]) * k; i ? x.lineTo(X, Y) : x.moveTo(X, Y); }); x.closePath(); }
   };
   const geo = topo.objects.countries.geometries.map(g => ({ id: g.id, rings: (g.type === 'MultiPolygon' ? g.arcs.flat() : g.arcs).map(ring) }));
-  for (const v of [false, true]) { x.beginPath(); for (const g of geo) if ((visited.has(g.id) && !(states && g.id === '840')) === v) g.rings.forEach(trace); x.fillStyle = v ? 'rgb(255,255,0)' : 'rgb(255,0,0)'; x.fill(); }
+  for (const v of [false, true]) { x.beginPath(); for (const g of geo) if ((visited.has(g.id) && !(states && g.id === '840') && !(V.regions && V.regions.countries.has(g.id))) === v) g.rings.forEach(trace); x.fillStyle = v ? 'rgb(255,255,0)' : 'rgb(255,0,0)'; x.fill(); }
   if (states) { x.beginPath(); for (const n of visitedStates) (states[n] || []).forEach(p => p.forEach(trace)); x.fillStyle = 'rgb(255,255,0)'; x.fill(); }
+  if (V.regions) { x.beginPath(); for (const r of V.regions.gold) r.forEach(p => p.forEach(trace)); x.fillStyle = 'rgb(255,255,0)'; x.fill(); }
   x.globalCompositeOperation = 'lighter'; x.strokeStyle = 'rgb(0,0,255)'; x.lineWidth = size / 4096;
-  x.beginPath(); for (const g of geo) g.rings.forEach(trace); if (states) for (const n in states) states[n].forEach(p => p.forEach(trace)); x.stroke();
+  x.beginPath(); for (const g of geo) g.rings.forEach(trace); if (states) for (const n in states) states[n].forEach(p => p.forEach(trace)); if (V.regions) for (const r of V.regions.all) r.forEach(p => p.forEach(trace)); x.stroke();
   return c;
 }
 
@@ -148,15 +151,39 @@ function drawBg() {
   g.addColorStop(0, `rgba(110,178,232,${.5 * (1 - e)})`); g.addColorStop(1, 'rgba(110,178,232,0)');
   bgx.fillStyle = g; bgx.fillRect(0, 0, W, H);
 }
-function drawPins() {
+function drawArcs(now) {
+  const groups = {};
+  for (const p of pins) if (p.trip && p.status !== 'want') (groups[p.trip] = groups[p.trip] || []).push(p);
+  fx.lineWidth = Math.max(1.4, Math.min(W, H) * .0018); fx.strokeStyle = V.glow; fx.globalAlpha = .85; fx.setLineDash([9, 7]); fx.lineDashOffset = -(now || 0) / 45;
+  for (const k in groups) {
+    const g = groups[k].slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+    for (let i = 1; i < g.length; i++) {
+      const A = g[i - 1], B = g[i], va = [Math.cos(A.lat) * Math.cos(A.lon), Math.cos(A.lat) * Math.sin(A.lon), Math.sin(A.lat)], vb = [Math.cos(B.lat) * Math.cos(B.lon), Math.cos(B.lat) * Math.sin(B.lon), Math.sin(B.lat)];
+      const om = Math.acos(Math.max(-1, Math.min(1, va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2]))); if (om < 1e-4) continue;
+      fx.beginPath(); let pen = false, lx = 0;
+      for (let t = 0; t <= 40; t++) {
+        const f = t / 40, a = Math.sin((1 - f) * om) / Math.sin(om), b = Math.sin(f * om) / Math.sin(om), X = a * va[0] + b * vb[0], Y = a * va[1] + b * vb[1], Z = a * va[2] + b * vb[2], la = Math.asin(Z), lo = Math.atan2(Y, X), [x, y, v] = project(lo, la, mill(la));
+        if (!v || (pen && Math.abs(x - lx) > W * .5)) { pen = false; lx = x; continue; }
+        pen ? fx.lineTo(x, y) : fx.moveTo(x, y); pen = true; lx = x;
+      }
+      fx.stroke();
+    }
+  }
+  fx.setLineDash([]); fx.globalAlpha = 1;
+}
+function drawPins(now) {
   fx.setTransform(dpr, 0, 0, dpr, 0, 0); fx.clearRect(0, 0, W, H);
+  if (V.arcs) drawArcs(now);
   const base = Math.max(2.2, Math.min(W, H) * .0032), labels = [], showNames = e >= 1 && z >= 3;
   const fs = Math.max(13, Math.min(W, H) * .016);
   for (const p of pins) {
     const [x, y, v] = project(p.lon, p.lat, p.my); p.x = x; p.y = y; p.v = v;
+    if ((V.filter && (V.filter === 'want' ? p.status !== 'want' : p.category !== V.filter)) || (V.maxRank != null && !(p.rank < V.maxRank))) { p.v = false; continue; }
     if (!v || x < -20 || y < -20 || x > W + 20 || y > H + 20) continue;
-    fx.globalAlpha = .28; fx.fillStyle = '#ffd98a'; fx.beginPath(); fx.arc(x, y, base * 3, 0, TAU); fx.fill();
-    fx.globalAlpha = 1; fx.fillStyle = '#fff6dc'; fx.beginPath(); fx.arc(x, y, base, 0, TAU); fx.fill();
+    const hue = V.cats[p.category];
+    if (p.status === 'want') { fx.globalAlpha = 1; fx.strokeStyle = '#8fd8ff'; fx.lineWidth = Math.max(1.5, base * .55); fx.beginPath(); fx.arc(x, y, base * 1.5, 0, TAU); fx.stroke(); if (showNames) labels.push(p); continue; }
+    fx.globalAlpha = .28; fx.fillStyle = hue || V.glow; fx.beginPath(); fx.arc(x, y, base * 3, 0, TAU); fx.fill();
+    fx.globalAlpha = 1; fx.fillStyle = hue || V.core; fx.beginPath(); fx.arc(x, y, base, 0, TAU); fx.fill();
     if (showNames) labels.push(p);
   }
   if (!labels.length) return;
@@ -175,13 +202,28 @@ function frame(now) {
   e = ease(tr);
   if (Math.abs(tz - z) > .0005) zoomTo(z + (tz - z) * (1 - Math.exp(-dt * 11)), ax, ay);
   if (tr === 0 && target === 0 && !drag && !reduced && spin) lam -= dt * rad(4.5);
+  if (window.WM && WM.onFrame) WM.onFrame(dt);
+  drawAll(now);
+  requestAnimationFrame(frame);
+}
+function drawAll(now) {
   gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.uniform1f(u.e, e); gl.uniform1f(u.lam, wrap(lam) * (1 - e)); gl.uniform1f(u.f0, tilt * (1 - e));
   gl.uniform1f(u.R, R * z); gl.uniform1f(u.S, S * z); gl.uniform2f(u.gc, gx, gy); gl.uniform2f(u.fc, fcx + px, fcy + py); gl.uniform2f(u.res, W, H);
   const fade = Math.max(0, Math.min(1, (z - 6) / 14)); gl.uniform1f(u.relief, 1 - fade * .75);
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
-  drawBg(); drawPins();
-  requestAnimationFrame(frame);
+  drawBg(); drawPins(now);
+}
+const THEMES = {
+  gold: { name: 'Gold', gold: [.86, .58, .21], land: [.17, .25, .33], sea: [.015, .05, .11], sea2: [.06, .17, .29], accent: '#e8ae47', core: '#fff6dc', glow: '#ffd98a' },
+  atlas: { name: 'Atlas', gold: [.82, .47, .14], land: [.74, .65, .47], sea: [.03, .1, .2], sea2: [.1, .24, .38], accent: '#e8ae47', core: '#fff6dc', glow: '#c4122f' },
+  glacier: { name: 'Glacier', gold: [.32, .72, .92], land: [.17, .23, .29], sea: [.012, .04, .08], sea2: [.04, .13, .22], accent: '#6fc8f0', core: '#eefaff', glow: '#9fe0ff' },
+  ember: { name: 'Ember', gold: [.9, .32, .16], land: [.2, .17, .18], sea: [.02, .03, .06], sea2: [.07, .09, .15], accent: '#f0603a', core: '#fff0e6', glow: '#ff9a70' },
+  forest: { name: 'Forest', gold: [.36, .7, .36], land: [.2, .22, .18], sea: [.012, .06, .08], sea2: [.04, .17, .2], accent: '#69c96f', core: '#f0fff0', glow: '#a5e8a8' }
+};
+function setColors(t) {
+  gl.uniform3fv(u.cGold, t.gold); gl.uniform3fv(u.cLand, t.land); gl.uniform3fv(u.cSea, t.sea); gl.uniform3fv(u.cSea2, t.sea2);
+  V.core = t.core; V.glow = t.glow; document.documentElement.style.setProperty('--gold', t.accent);
 }
 function setMode(flat) {
   target = flat ? 1 : 0; document.body.classList.toggle('flat', flat); $('back').hidden = !flat; hideTip();
@@ -190,7 +232,7 @@ function setMode(flat) {
 const tip = $('tip');
 function hideTip() { tip.hidden = true; }
 function nearest(x, y, r) { let b = null, d = r * r; for (const p of pins) { if (!p.v) continue; const q = (p.x - x) ** 2 + (p.y - y) ** 2; if (q < d) { d = q; b = p; } } return b; }
-function showTip(p) { tip.textContent = p.name; if (p.note) { const s = document.createElement('small'); s.textContent = p.note; tip.append(s); } tip.style.left = p.x + 'px'; tip.style.top = p.y + 'px'; tip.hidden = false; }
+function showTip(p) { tip.textContent = p.name; const sub = [p.status === 'want' ? 'Want to Go' : '', p.date, p.category, p.note].filter(Boolean).join(' · '); if (sub) { const s = document.createElement('small'); s.textContent = sub; tip.append(s); } tip.style.left = p.x + 'px'; tip.style.top = p.y + 'px'; tip.hidden = false; }
 
 const ptrs = new Map(); let drag = null, spin = true, pinch = 0, lastTap = 0;
 glc.addEventListener('pointerdown', ev => {
@@ -224,6 +266,7 @@ const endPtr = ev => {
   if (now - lastTap < 320) { setZoom(tz * 2, ev.clientX, ev.clientY); lastTap = 0; return; }
   lastTap = now;
   const p = nearest(ev.clientX, ev.clientY, ev.pointerType === 'touch' ? 26 : 16); p ? showTip(p) : hideTip();
+  if (p && window.WM && WM.onPinTap) WM.onPinTap(p);
 };
 glc.addEventListener('pointerup', endPtr); glc.addEventListener('pointercancel', endPtr);
 glc.addEventListener('wheel', ev => { ev.preventDefault(); setZoom(tz * Math.exp(-ev.deltaY * .0022), ev.clientX, ev.clientY); hideTip(); }, { passive: false });
@@ -249,25 +292,39 @@ addEventListener('resize', () => { layout(); });
 async function start() {
   const t0 = performance.now();
   if (!gl) { $('load').textContent = 'This Browser Needs WebGL 2 to Show the Globe'; return; }
+  const shareTok = new URLSearchParams(location.hash.slice(1)).get('share');
   const img = new Image(); img.src = lite ? 'assets/terrain-4k.jpg' : 'assets/terrain-8k.jpg';
   const [topo, data, states] = await Promise.all([fetch('assets/countries-50m.json').then(r => r.json()), fetch('data/places.json', { cache: 'no-cache' }).then(r => r.json()), fetch('assets/us-states.json?v=1').then(r => r.json()), img.decode()]);
+  let shared = null;
+  if (shareTok) try {
+    const bin = atob(shareTok.replace(/-/g, '+').replace(/_/g, '/')), bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    const parsed = JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text());
+    if (Array.isArray(parsed.places) && Array.isArray(parsed.visitedCountries)) shared = parsed;
+  } catch (err) { console.error(err); }
+  if (shared) { Object.keys(data).forEach(k => delete data[k]); Object.assign(data, shared); document.body.classList.add('shared'); }
   const T = {}, mark = n => { T[n] = Math.round(performance.now() - t0); }; mark('fetched');
   program(); grid(); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
   texture(0, img); mark('terrainUpload');
   mark('maskDrawn'); window.__times = T;
-  gl.uniform1i(u.ter, 0); gl.uniform1i(u.msk, 1);
+  gl.uniform1i(u.ter, 0); gl.uniform1i(u.msk, 1); gl.uniform1i(u.lit, 2);
+  setColors(THEMES.gold); gl.uniform1f(u.dn, 0); gl.uniform3f(u.sun, 1, 0, 0);
   let maskTex = null;
   const applyData = d => {
+    if (window.WM) WM.current = d;
     if (maskTex) gl.deleteTexture(maskTex);
     maskTex = texture(1, countryMask(topo, new Set(d.visitedCountries), d.visitedStates ? states : null, d.visitedStates || []));
     pins = d.places.map(p => { const lat = rad(p.lat); return { ...p, lon: rad(p.lon), lat, my: mill(lat) }; });
     const nC = d.visitedCountries.length, nS = (d.visitedStates || []).filter(n => n !== 'District of Columbia').length;
-    $('nC').textContent = nC; $('lC').textContent = `Countries, ${Math.max(0, COUNTRIES - nC)} to Go`; $('nS').textContent = nS; $('lS').textContent = `States, ${50 - nS} to Go`; $('nP').textContent = pins.length;
+    $('nC').textContent = nC; $('lC').textContent = `Countries, ${Math.max(0, COUNTRIES - nC)} to Go`; $('nS').textContent = nS; $('lS').textContent = `States, ${50 - nS} to Go`; $('nP').textContent = pins.filter(p => p.status !== 'want').length;
+    window.dispatchEvent(new Event('wm-data'));
   };
   window.WM = {
-    topo, states, base: data, applyData, setMode, isFlat: () => target === 1, isSettled: () => tr === target,
+    COUNTRIES, topo, states, base: data, readOnly: !!shared, view: V, setRanks(r) { pins.forEach(p => { p.rank = r.get(p.name); }); }, THEMES, setColors, refresh: () => applyData(WM.current), lite,
+    setDayNight(v, sv) { gl.uniform1f(u.dn, v); if (sv) gl.uniform3f(u.sun, sv[0], sv[1], sv[2]); }, setLights(i) { texture(2, i); },
+    poster(cb) { layout(1920, 1080, 2); drawAll(performance.now()); cb(bg, glc, fg, { W: 1920, H: 1080 }); layout(); }, applyData, setMode, isFlat: () => target === 1, isSettled: () => tr === target,
     unproject(x, y) { const lon = (x - fcx - px) / (S * z), m = (fcy + py - y) / (S * z); return [lon * 180 / Math.PI, (Math.atan(Math.exp(m / 1.25)) - Math.PI / 4) / .4 * 180 / Math.PI]; }
   };
+  WM.current = data;
   applyData(data);
   window.dispatchEvent(new Event('wm-ready'));
   layout();
